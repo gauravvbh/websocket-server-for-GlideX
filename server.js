@@ -7,7 +7,6 @@ const port = process.env.PORT || 8080;
 
 const wss = new WebSocketServer({ port })
 
-console.log('🚀 WebSocket server started on ws://localhost:8080');
 
 wss.on("connection", (ws) => {
     ws.on("message", (message) => {
