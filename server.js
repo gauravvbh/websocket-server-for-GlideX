@@ -107,6 +107,29 @@ wss.on("connection", (ws) => {
             }
 
 
+            if (data.type === 'onDuty' && data.role === 'rider') {
+                for (let [sock, info] of clients.entries()) {
+                    if (info.id === data.id && info.role === data.role) {
+                        clients.delete(sock)
+                        sock.close()
+                        console.log(`⚠️ Duplicate connection removed for ${info.role} - ${info.id}`)
+                    }
+                }
+
+                clients.set(ws, { role: data.role, id: data.driverId })
+                console.log(`✅ On Duty ${data.role} - ${data.driverId}`)
+
+                clients.forEach((clientInfo, clientWs) => {
+                    if (clientInfo.role === 'customer') {
+                        clientWs.send(JSON.stringify({
+                            type: 'driverOnDuty',
+                            id: data.driverId
+                        }))
+                    }
+                })
+            }
+
+
             // Customer logout
             if (data.type === 'customerLogout' && data.role === 'customer') {
                 delete drivers[data.driverId]
