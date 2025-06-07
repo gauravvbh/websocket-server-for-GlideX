@@ -108,10 +108,19 @@ wss.on("connection", (ws) => {
 
 
             if (data.type === 'onDuty' && data.role === 'rider') {
-                for (let [sock, info] of drivers.entries()) {
+                // for (let [sock, info] of drivers.entries()) {
+                //     if (info.id === data.driverId && info.role === data.role) {
+                //         drivers.delete(sock)
+                //         sock.close()
+                //         console.log(`⚠️ Duplicate connection removed for ${info.role} - ${info.id}`)
+                //     }
+                // }
+
+                for (let sock in drivers) {
+                    const info = drivers[sock]
                     if (info.id === data.driverId && info.role === data.role) {
-                        drivers.delete(sock)
-                        sock.close()
+                        delete drivers[sock]
+                        // You’ll need to figure out how to close the corresponding WebSocket
                         console.log(`⚠️ Duplicate connection removed for ${info.role} - ${info.id}`)
                     }
                 }
