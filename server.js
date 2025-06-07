@@ -30,17 +30,6 @@ wss.on("connection", (ws) => {
 
                 clients.set(ws, { role: data.role, id: data.id })
                 console.log(`✅ Registered ${data.role} - ${data.id}`)
-
-                if(data.role==='rider'){
-                    clients.forEach((clientInfo, clientWs) => {
-                        if (ws !== clientWs && clientInfo.role === 'customer') {
-                            clientWs.send(JSON.stringify({
-                                type: 'riderRegistered',
-                                details:data.details
-                            }))
-                        }
-                    });
-                }
                 return;
             }
 
