@@ -108,15 +108,15 @@ wss.on("connection", (ws) => {
 
 
             if (data.type === 'onDuty' && data.role === 'rider') {
-                for (let [sock, info] of clients.entries()) {
+                for (let [sock, info] of drivers.entries()) {
                     if (info.id === data.driverId && info.role === data.role) {
-                        clients.delete(sock)
+                        drivers.delete(sock)
                         sock.close()
                         console.log(`⚠️ Duplicate connection removed for ${info.role} - ${info.id}`)
                     }
                 }
 
-                clients.set(ws, { role: data.role, id: data.driverId })
+                drivers.set(ws, { role: data.role, id: data.driverId })
                 console.log(`✅ On Duty ${data.role} - ${data.driverId}`)
 
                 clients.forEach((clientInfo, clientWs) => {
