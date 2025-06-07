@@ -30,6 +30,17 @@ wss.on("connection", (ws) => {
 
                 clients.set(ws, { role: data.role, id: data.id })
                 console.log(`✅ Registered ${data.role} - ${data.id}`)
+
+                if(data.role==='rider'){
+                    clients.forEach((clientInfo, clientWs) => {
+                        if (ws !== clientWs && clientInfo.role === 'customer') {
+                            clientWs.send(JSON.stringify({
+                                type: 'riderRegistered',
+                                details:data.details
+                            }))
+                        }
+                    });
+                }
                 return;
             }
 
@@ -109,7 +120,7 @@ wss.on("connection", (ws) => {
 
             if (data.type === 'onDuty' && data.role === 'rider') {
                 for (let [sock, info] of clients.entries()) {
-                    if (info.id === data.id && info.role === data.role) {
+                    if (info.id === data.driverId && info.role === data.role) {
                         clients.delete(sock)
                         sock.close()
                         console.log(`⚠️ Duplicate connection removed for ${info.role} - ${info.id}`)
