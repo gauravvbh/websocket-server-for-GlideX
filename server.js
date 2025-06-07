@@ -108,26 +108,24 @@ wss.on("connection", (ws) => {
 
 
             if (data.type === 'onDuty' && data.role === 'rider') {
-                // for (let [sock, info] of drivers.entries()) {
-                //     if (info.id === data.driverId && info.role === data.role) {
-                //         drivers.delete(sock)
-                //         sock.close()
-                //         console.log(`⚠️ Duplicate connection removed for ${info.role} - ${info.id}`)
-                //     }
-                // }
-
-                for (let sock in drivers) {
-                    const info = drivers[sock]
+                // Remove any duplicate entries
+                for (let driverId in drivers) {
+                    const info = drivers[driverId]
                     if (info.id === data.driverId && info.role === data.role) {
-                        delete drivers[sock]
-                        // You’ll need to figure out how to close the corresponding WebSocket
+                        delete drivers[driverId]
                         console.log(`⚠️ Duplicate connection removed for ${info.role} - ${info.id}`)
                     }
                 }
 
-                drivers.set(ws, { role: data.role, id: data.driverId })
+                // Add or update driver by driverId
+                drivers[data.driverId] = {
+                    id: data.driverId,
+                    role: data.role
+                }
+
                 console.log(`✅ On Duty ${data.role} - ${data.driverId}`)
 
+                // Notify all customers
                 clients.forEach((clientInfo, clientWs) => {
                     if (clientInfo.role === 'customer') {
                         clientWs.send(JSON.stringify({
@@ -137,7 +135,7 @@ wss.on("connection", (ws) => {
                     }
                 })
             }
-
+            
 
             // Customer logout
             if (data.type === 'customerLogout' && data.role === 'customer') {
