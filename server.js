@@ -135,7 +135,7 @@ wss.on("connection", (ws) => {
                     }
                 })
             }
-            
+
 
             // Customer logout
             if (data.type === 'customerLogout' && data.role === 'customer') {
@@ -303,6 +303,47 @@ wss.on("connection", (ws) => {
                 if (customerSocket) {
                     customerSocket.send(JSON.stringify({
                         type: 'rideEnded',
+                        id: data.id
+                    }))
+                }
+            }
+
+
+            if (data.type === 'reachedDestinationVerified' && data.role === 'customer') {
+                const targetRiderId = data.rider_id
+                let riderSocket = null
+
+                for (let [clientWs, clientInfo] of clients.entries()) {
+                    if (clientInfo.role === 'rider' && clientInfo.id === targetRiderId) {
+                        riderSocket = clientWs
+                        break
+                    }
+                }
+
+                if (riderSocket) {
+                    riderSocket.send(JSON.stringify({
+                        type: 'reachedVerified',
+                        id: data.id
+                    }))
+                }
+            }
+
+
+
+            if (data.type === 'noConfirmationAlert' && data.role === 'customer') {
+                const targetRiderId = data.rider_id
+                let riderSocket = null
+
+                for (let [clientWs, clientInfo] of clients.entries()) {
+                    if (clientInfo.role === 'rider' && clientInfo.id === targetRiderId) {
+                        riderSocket = clientWs
+                        break
+                    }
+                }
+
+                if (riderSocket) {
+                    riderSocket.send(JSON.stringify({
+                        type: 'customerDidNotVerify',
                         id: data.id
                     }))
                 }
