@@ -152,7 +152,7 @@ wss.on("connection", (ws) => {
             if (data.type === 'rideOffer' &&
                 data.role === 'customer' &&
                 data.rideDetails &&
-                data.rideDetails.status === 'offer') {
+                data.rideDetails.status === 'Offer') {
 
                 console.log("🧭 Entered rideOffer handling block")
                 const targetDriverId = data.rideDetails.rider_id
